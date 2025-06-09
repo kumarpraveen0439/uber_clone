@@ -204,3 +204,109 @@ The response will be in JSON format with the following fields upon a successful 
   "error": "Internal server error"
 }
 ```
+
+---
+
+## User Profile Endpoint
+
+### Endpoint
+GET /users/profile
+
+### Description
+This endpoint returns the authenticated user's profile information. The request must include a valid JWT token in the Authorization header as a Bearer token or as a cookie.
+
+### Required Data Format
+No request body is required. The JWT token must be provided in the request headers or cookies.
+
+- **Authorization**: Bearer <token> (header) or `token` cookie.
+
+### Example Request (with header)
+```
+GET /users/profile
+Authorization: Bearer <your-jwt-token>
+```
+
+### Response Data Format
+The response will be in JSON format with the following fields:
+
+- **fullname**: (object)
+  - **firstname** (string): The user's first name.
+  - **lastname** (string or null): The user's last name.
+- **email**: (string): The user's email address.
+- **socialId**: (string or null): The associated social ID if any.
+- **createdAt**: (string): The timestamp (ISO format) when the user was created.
+- **updatedAt**: (string): The timestamp (ISO format) when the user was last updated.
+- **__v**: (number): The document version key.
+
+### Example Response
+
+#### Success (200 OK)
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "johndoe@example.com",
+  "socialId": null,
+  "createdAt": "2025-05-29T12:00:00.000Z",
+  "updatedAt": "2025-05-29T12:00:00.000Z",
+  "__v": 0
+}
+```
+
+#### Error (401 Unauthorized)
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+---
+
+## User Logout Endpoint
+
+### Endpoint
+GET /users/logout
+
+### Description
+This endpoint logs out the authenticated user by invalidating their JWT token. The request must include a valid JWT token in the Authorization header or as a cookie.
+
+### Required Data Format
+No request body is required. The JWT token must be provided in the request headers or cookies.
+
+- **Authorization**: Bearer <token> (header) or `token` cookie.
+
+### Example Request (with header)
+```
+GET /users/logout
+Authorization: Bearer <your-jwt-token>
+```
+
+### Response Data Format
+The response will be in JSON format with the following field:
+
+- **message**: (string) A message indicating successful logout.
+
+### Example Response
+
+#### Success (200 OK)
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### Error (401 Unauthorized)
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Error (500 Internal Server Error)
+```json
+{
+  "error": "Internal server error"
+}
+```
