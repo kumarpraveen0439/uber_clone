@@ -316,7 +316,7 @@ The response will be in JSON format with the following field:
 # Captain Registration Endpoint
 
 ## Endpoint
-POST /captain/register
+POST /captains/register
 
 ## Description
 This endpoint registers a new captain (driver) in the system. It validates the incoming data and creates a captain record in the database. On successful registration, it returns the created captain's details.
