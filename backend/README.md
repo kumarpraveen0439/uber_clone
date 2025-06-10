@@ -310,3 +310,112 @@ The response will be in JSON format with the following field:
   "error": "Internal server error"
 }
 ```
+
+---
+
+# Captain Registration Endpoint
+
+## Endpoint
+POST /captain/register
+
+## Description
+This endpoint registers a new captain (driver) in the system. It validates the incoming data and creates a captain record in the database. On successful registration, it returns the created captain's details.
+
+## Required Data Format
+The request body should be in JSON format with the following fields:
+
+- **fullname**: An object containing the captain's name details.
+  - **firstname** (string, required): Must be at least 3 characters long.
+  - **lastname** (string, optional): If provided, must be at least 3 characters long.
+- **email** (string, required): Must be a valid email address.
+- **password** (string, required): Must be at least 6 characters long.
+- **vehicle**: An object containing the vehicle details.
+  - **color** (string, required): Must be at least 3 characters long.
+  - **plate** (string, required): Must be at least 3 characters long.
+  - **capacity** (integer, required): Must be at least 1.
+  - **vehicleType** (string, required): Must be one of `"car"`, `"bike"`, or `"auto"`.
+
+### Example Request
+```json
+{
+  "fullname": {
+    "firstname": "Alex",
+    "lastname": "Smith"
+  },
+  "email": "alexsmith@example.com",
+  "password": "captainPass123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+## Response Data Format
+The response will be in JSON format with the following fields upon a successful registration:
+
+- **_id**: (string) The captain's unique ID.
+- **fullname**: (object)
+  - **firstname** (string): The captain's first name.
+  - **lastname** (string or null): The captain's last name.
+- **email**: (string): The captain's email address.
+- **vehicle**: (object)
+  - **color** (string): The vehicle's color.
+  - **plate** (string): The vehicle's plate number.
+  - **capacity** (integer): The vehicle's capacity.
+  - **vehicleType** (string): The type of vehicle.
+- **createdAt**: (string): The timestamp (ISO format) when the captain was created.
+- **updatedAt**: (string): The timestamp (ISO format) when the captain was last updated.
+- **__v**: (number): The document version key.
+
+### Example Response
+
+#### Success (201 Created)
+```json
+{
+  "_id": "665f1a2b3c4d5e6f7a8b9c0d",
+  "fullname": {
+    "firstname": "Alex",
+    "lastname": "Smith"
+  },
+  "email": "alexsmith@example.com",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC1234",
+    "capacity": 4,
+    "vehicleType": "car"
+  },
+  "createdAt": "2025-06-11T12:00:00.000Z",
+  "updatedAt": "2025-06-11T12:00:00.000Z",
+  "__v": 0
+}
+```
+
+#### Error (400 Bad Request)
+```json
+{
+  "errors": [
+    {
+      "msg": "First name must be at least 3 characters long",
+      "param": "fullname.firstname",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### Error (400 Email Already Exists)
+```json
+{
+  "error": "Email already exists"
+}
+```
+
+#### Error (500 Internal Server Error)
+```json
+{
+  "error": "Error creating captain"
+}
+```

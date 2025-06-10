@@ -1,5 +1,6 @@
 // Express app configure.....(routes, middleware, db conection etc.)
 const userRoutes = require('./routes/user_Routes');
+const captionRoutes = require('./routes/captain_Routes');
 const cookiesParser = require('cookie-parser');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -25,5 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoutes);
+app.use('/captions', captionRoutes);
+
 
 module.exports = app;
