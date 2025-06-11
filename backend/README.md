@@ -1,5 +1,3 @@
-# User Registration and Login Endpoints
-
 ## User Registration Endpoint
 
 ### Endpoint
@@ -313,15 +311,17 @@ The response will be in JSON format with the following field:
 
 ---
 
-# Captain Registration Endpoint
+# Captain Registration and Login Endpoints
 
-## Endpoint
+## Captain Registration Endpoint
+
+### Endpoint
 POST /captains/register
 
-## Description
-This endpoint registers a new captain (driver) in the system. It validates the incoming data and creates a captain record in the database. On successful registration, it returns the created captain's details.
+### Description
+This endpoint registers a new captain (driver) in the system. It validates the incoming data and creates a captain record in the database. On successful registration, it returns a JWT authentication token along with the captain's details.
 
-## Required Data Format
+### Required Data Format
 The request body should be in JSON format with the following fields:
 
 - **fullname**: An object containing the captain's name details.
@@ -353,43 +353,48 @@ The request body should be in JSON format with the following fields:
 }
 ```
 
-## Response Data Format
+### Response Data Format
 The response will be in JSON format with the following fields upon a successful registration:
 
-- **_id**: (string) The captain's unique ID.
-- **fullname**: (object)
-  - **firstname** (string): The captain's first name.
-  - **lastname** (string or null): The captain's last name.
-- **email**: (string): The captain's email address.
-- **vehicle**: (object)
-  - **color** (string): The vehicle's color.
-  - **plate** (string): The vehicle's plate number.
-  - **capacity** (integer): The vehicle's capacity.
-  - **vehicleType** (string): The type of vehicle.
-- **createdAt**: (string): The timestamp (ISO format) when the captain was created.
-- **updatedAt**: (string): The timestamp (ISO format) when the captain was last updated.
-- **__v**: (number): The document version key.
+- **token**: (string) A JWT token for authenticating the captain.
+- **captain**: (object) The created captain's data which includes:
+  - **_id**: (string) The captain's unique ID.
+  - **fullname**: (object)
+    - **firstname** (string): The captain's first name.
+    - **lastname** (string or null): The captain's last name.
+  - **email**: (string): The captain's email address.
+  - **vehicle**: (object)
+    - **color** (string): The vehicle's color.
+    - **plate** (string): The vehicle's plate number.
+    - **capacity** (integer): The vehicle's capacity.
+    - **vehicleType** (string): The type of vehicle.
+  - **createdAt**: (string): The timestamp (ISO format) when the captain was created.
+  - **updatedAt**: (string): The timestamp (ISO format) when the captain was last updated.
+  - **__v**: (number): The document version key.
 
 ### Example Response
 
 #### Success (201 Created)
 ```json
 {
-  "_id": "665f1a2b3c4d5e6f7a8b9c0d",
-  "fullname": {
-    "firstname": "Alex",
-    "lastname": "Smith"
-  },
-  "email": "alexsmith@example.com",
-  "vehicle": {
-    "color": "Red",
-    "plate": "ABC1234",
-    "capacity": 4,
-    "vehicleType": "car"
-  },
-  "createdAt": "2025-06-11T12:00:00.000Z",
-  "updatedAt": "2025-06-11T12:00:00.000Z",
-  "__v": 0
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "665f1a2b3c4d5e6f7a8b9c0d",
+    "fullname": {
+      "firstname": "Alex",
+      "lastname": "Smith"
+    },
+    "email": "alexsmith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "createdAt": "2025-06-11T12:00:00.000Z",
+    "updatedAt": "2025-06-11T12:00:00.000Z",
+    "__v": 0
+  }
 }
 ```
 
@@ -417,5 +422,221 @@ The response will be in JSON format with the following fields upon a successful 
 ```json
 {
   "error": "Error creating captain"
+}
+```
+
+---
+
+## Captain Login Endpoint
+
+### Endpoint
+POST /captains/login
+
+### Description
+This endpoint authenticates an existing captain in the system using their email and password. Upon successful authentication, it returns a JWT token along with the captain's data.
+
+### Required Data Format
+The request body should be in JSON format with the following fields:
+
+- **email** (string, required): Must be a valid email address.
+- **password** (string, required): Must be at least 6 characters long.
+
+### Example Request
+```json
+{
+  "email": "alexsmith@example.com",
+  "password": "captainPass123"
+}
+```
+
+### Response Data Format
+The response will be in JSON format with the following fields upon a successful login:
+
+- **token**: (string) A JWT token for authenticating the captain.
+- **captain**: (object) The logged in captain's data.
+
+### Example Response
+
+#### Success (200 OK)
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "665f1a2b3c4d5e6f7a8b9c0d",
+    "fullname": {
+      "firstname": "Alex",
+      "lastname": "Smith"
+    },
+    "email": "alexsmith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "createdAt": "2025-06-11T12:00:00.000Z",
+    "updatedAt": "2025-06-11T12:00:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+#### Error (400 Bad Request)
+```json
+{
+  "errors": [
+    {
+      "msg": "Please fill a valid email address",
+      "param": "email",
+      "location": "body"
+    },
+    {
+      "msg": "Password must be at least 6 characters long",
+      "param": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### Error (400 Invalid Email or Password)
+```json
+{
+  "error": "Invalid email or password"
+}
+```
+
+#### Error (500 Internal Server Error)
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+---
+
+## Captain Profile Endpoint
+
+### Endpoint
+GET /captains/profile
+
+### Description
+This endpoint returns the authenticated captain's profile information. The request must include a valid JWT token in the Authorization header as a Bearer token or as a cookie.
+
+### Required Data Format
+No request body is required. The JWT token must be provided in the request headers or cookies.
+
+- **Authorization**: Bearer <token> (header) or `token` cookie.
+
+### Example Request (with header)
+```
+GET /captains/profile
+Authorization: Bearer <your-jwt-token>
+```
+
+### Response Data Format
+The response will be in JSON format with the following fields:
+
+- **captain**: (object) The captain's profile data.
+
+### Example Response
+
+#### Success (200 OK)
+```json
+{
+  "captain": {
+    "_id": "665f1a2b3c4d5e6f7a8b9c0d",
+    "fullname": {
+      "firstname": "Alex",
+      "lastname": "Smith"
+    },
+    "email": "alexsmith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC1234",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "createdAt": "2025-06-11T12:00:00.000Z",
+    "updatedAt": "2025-06-11T12:00:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+#### Error (401 Unauthorized)
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Error (404 Not Found)
+```json
+{
+  "error": "Captain not found"
+}
+```
+
+#### Error (500 Internal Server Error)
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+---
+
+## Captain Logout Endpoint
+
+### Endpoint
+GET /captains/logout
+
+### Description
+This endpoint logs out the authenticated captain by invalidating their JWT token. The request must include a valid JWT token in the Authorization header or as a cookie.
+
+### Required Data Format
+No request body is required. The JWT token must be provided in the request headers or cookies.
+
+- **Authorization**: Bearer <token> (header) or `token` cookie.
+
+### Example Request (with header)
+```
+GET /captains/logout
+Authorization: Bearer <your-jwt-token>
+```
+
+### Response Data Format
+The response will be in JSON format with the following field:
+
+- **message**: (string) A message indicating successful logout.
+
+### Example Response
+
+#### Success (200 OK)
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+#### Error (400 No Token Provided)
+```json
+{
+  "error": "No token provided"
+}
+```
+
+#### Error (401 Unauthorized)
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### Error (500 Internal Server Error)
+```json
+{
+  "error": "Internal server error"
 }
 ```
